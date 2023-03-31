@@ -72,7 +72,7 @@ struct LoginView: View {
         if isLoginMode {
             print("Should log into the firebase")
         } else {
-            print("Register a new account inside of Firebase Auth")
+            print("Register a new account inside of Firebase Auth.")
         }
     }
 }
