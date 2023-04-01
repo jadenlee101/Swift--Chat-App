@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     
@@ -13,8 +14,13 @@ struct LoginView: View {
     @State var email = ""
     @State var password = ""
     
+   //init() {
+    //    FirebaseApp.configure()
+    //}
+    
     var body: some View {
         
+
         
         NavigationView {
             ScrollView {
@@ -65,6 +71,7 @@ struct LoginView: View {
             .navigationTitle(isLoginMode ? "Login" : "Create account")
             .background(Color(.init(white: 0, alpha: 0.05)))
         }
+        .navigationViewStyle(StackNavigationViewStyle())
         
     }
     
@@ -75,6 +82,9 @@ struct LoginView: View {
             print("Register a new account inside of Firebase Auth.")
         }
     }
+    //private func createNewAccount() {
+    //    Auth.auth().createUser(withEmail: <#T##String#>, password: <#T##String#>)
+    //}
 }
 
 struct ContentView_Previews: PreviewProvider {
