@@ -58,12 +58,14 @@ struct LoginView: View {
                             Text (isLoginMode ? "Login" : "Create Account")
                                 .foregroundColor(.white)
                                 .padding(.vertical, 10 )
-                                
+                            
                             Spacer()
                         }.background(Color.blue)
                     }
                 }
                 .padding()
+                Text (self.loginStatusMessage)
+                    .foregroundColor(.red)
                 
                 
                 
@@ -78,13 +80,38 @@ struct LoginView: View {
     private func handleAction() {
         if isLoginMode {
             print("Should log into the firebase")
+            loginUser()
         } else {
             print("Register a new account inside of Firebase Auth.")
+            createNewAccount()
         }
     }
-    //private func createNewAccount() {
-    //    Auth.auth().createUser(withEmail: <#T##String#>, password: <#T##String#>)
-    //}
+    
+    private func loginUser() {
+        Auth.auth().signIn(withEmail: email, password: password) {
+            result, err in if let err = err {
+                print("failed to loggin in user", err)
+                self.loginStatusMessage = "failed to loggin user \(err)"
+                return
+            }
+            print("success user login \(result?.user.uid ?? "")")
+            self.loginStatusMessage = "success user login \(result?.user.uid ?? "")"
+        }
+    }
+    @State var loginStatusMessage = ""
+    
+    private func createNewAccount() {
+        Auth.auth().createUser(withEmail: email, password: password) {
+            result, err in if let err = err {
+                print("failed to create a new account", err)
+                self.loginStatusMessage = "failed to create a new account \(err)"
+                return
+            }
+            print("success user \(result?.user.uid ?? "")")
+            self.loginStatusMessage = "success user \(result?.user.uid ?? "")"
+        }
+        //print (email, password)
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
