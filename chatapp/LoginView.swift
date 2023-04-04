@@ -27,6 +27,7 @@ struct LoginView: View {
     @State var isLoginMode = false
     @State var email = ""
     @State var password = ""
+    @State var shouldShowImagePicker = false
     
    //init() {
     //    FirebaseApp.configure()
@@ -48,7 +49,7 @@ struct LoginView: View {
                     
                     if !isLoginMode {
                     Button {
-                        
+                        shouldShowImagePicker.toggle()
                     } label: {
                     Image(systemName: "person.fill")
                             .font(.system(size: 64))
@@ -88,8 +89,13 @@ struct LoginView: View {
             .background(Color(.init(white: 0, alpha: 0.05)))
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil ) {
+            ImagePicker(image: $image)
+            
+        }
         
     }
+    @State var image: UIImage?
     
     private func handleAction() {
         if isLoginMode {
