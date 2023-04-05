@@ -7,9 +7,54 @@
 
 import SwiftUI
 
+class MainMessaseViewModel: ObservableObject {
+    @Published var errorMessage = ""
+    
+    init (){
+        fetchCurrentUser()
+    }
+    
+    private func fetchCurrentUser(){
+        
+        guard let uid = 
+        FirebaseManager.shared.auth.currentUser?.uid else {return}
+        self.errorMessage = "\(uid)"
+        FirebaseManager.shared.firestore.collection("users")
+            .document(uid).getDocument{snapshot, err in
+                if let err = err {
+                    print("failed to fetch current user", err)
+                    return
+                }
+                
+                guard let data = snapshot?.data() else {return }
+                print (data)
+            }
+    }
+}
+
 struct MainMessagesView: View {
     
     @State var shouldShowLogOut = false
+    
+    @ObservedObject private var vm = MainMessaseViewModel()
+    
+    var body: some View {
+        NavigationView{
+            //nav bar
+            VStack{
+                Text("Current user id:  \(vm.errorMessage)")
+                customNavBar
+                messagesView
+                
+                
+            }
+            .overlay(
+                newMessageButton, alignment: .bottom
+            )
+            .navigationBarHidden(true)
+            
+        }
+    }
     
     private var customNavBar : some View {
         HStack(spacing: 14){
@@ -92,23 +137,7 @@ struct MainMessagesView: View {
         .padding(.bottom, 50)
     }
     
-    var body: some View {
-        NavigationView{
-            //nav bar
-            VStack{
-                customNavBar
-                
-                messagesView
-                
-                
-            }
-            .overlay(
-                newMessageButton, alignment: .bottom
-            )
-            .navigationBarHidden(true)
-            
-        }
-    }
+    
 }
 
 struct MainMessagesView_Previews: PreviewProvider {
