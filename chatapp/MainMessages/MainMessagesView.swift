@@ -18,6 +18,10 @@ class MainMessaseViewModel: ObservableObject {
     @Published var chatUser : ChatUser?
     
     init (){
+        DispatchQueue.main.async {
+            self.isUserCurrentlyLoggedOut =
+            FirebaseManager.shared.auth.currentUser?.uid == nil 
+        }
         fetchCurrentUser()
     }
     
@@ -45,6 +49,12 @@ class MainMessaseViewModel: ObservableObject {
                 
                 //self.errorMessage = "\(chatUser.email)"
             }
+    }
+    @Published var isUserCurrentlyLoggedOut = false
+    
+    func handleSignout () {
+        isUserCurrentlyLoggedOut.toggle()
+        try? FirebaseManager.shared.auth.signOut()
     }
 }
 
@@ -112,7 +122,20 @@ struct MainMessagesView: View {
         .padding(.horizontal)
         .padding(.bottom)
         .actionSheet(isPresented: $shouldShowLogOut) {
-            .init(title: Text("Settings"), message:Text("What do you want to do?"), buttons: [.destructive(Text("Sign out"), action: {print("signed out")}), .cancel()])
+            .init(title: Text("Settings"),
+                  message:Text("What do you want to do?"),
+                  buttons: [
+                    .destructive(
+                        Text("Sign out"),
+                        action:{
+                            print("signed out")
+                            vm.handleSignout()
+                            
+                        }
+                    ), .cancel()])
+        }
+        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut, onDismiss: nil) {
+            LoginView()
         }
     }
     
