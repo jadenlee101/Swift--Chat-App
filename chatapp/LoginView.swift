@@ -14,11 +14,12 @@ import FirebaseFirestore
 
 
 struct LoginView: View {
+    let didCompleteLogin: () -> ()
     
-    @State var isLoginMode = false
-    @State var email = ""
-    @State var password = ""
-    @State var shouldShowImagePicker = false
+    @State private var isLoginMode = false
+    @State private var email = ""
+    @State private var password = ""
+    @State private var shouldShowImagePicker = false
     
    //init() {
     //    FirebaseApp.configure()
@@ -127,11 +128,16 @@ struct LoginView: View {
             }
             print("success user login \(result?.user.uid ?? "")")
             self.loginStatusMessage = "success user login \(result?.user.uid ?? "")"
+            self.didCompleteLogin()
         }
     }
     @State var loginStatusMessage = ""
     
     private func createNewAccount() {
+        if self.image == nil {
+            self.loginStatusMessage = "You must select an image"
+            return
+        }
         FirebaseManager.shared.auth.createUser(withEmail: email, password: password) {
             result, err in if let err = err {
                 print("failed to create a new account", err)
@@ -191,6 +197,6 @@ struct LoginView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(didCompleteLogin: {})
     }
 }
