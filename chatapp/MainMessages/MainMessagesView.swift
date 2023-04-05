@@ -6,9 +6,16 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
+
+struct ChatUser {
+    let uid, email, profileImageUrl : String
+}
 
 class MainMessaseViewModel: ObservableObject {
+    
     @Published var errorMessage = ""
+    @Published var chatUser : ChatUser?
     
     init (){
         fetchCurrentUser()
@@ -22,12 +29,21 @@ class MainMessaseViewModel: ObservableObject {
         FirebaseManager.shared.firestore.collection("users")
             .document(uid).getDocument{snapshot, err in
                 if let err = err {
+                    self.errorMessage = "Could not find user"
                     print("failed to fetch current user", err)
                     return
                 }
                 
-                guard let data = snapshot?.data() else {return }
-                print (data)
+                guard let data = snapshot?.data() else {
+                    self.errorMessage = "no data found"
+                    return
+                }
+                let uid = data["uid"] as? String ?? ""
+                let email = data["email"] as? String ?? ""
+                let profileImageUrl = data["profileImageUrl"] as? String ?? ""
+                self.chatUser = ChatUser(uid: uid, email: email, profileImageUrl: profileImageUrl)
+                
+                //self.errorMessage = "\(chatUser.email)"
             }
     }
 }
@@ -42,7 +58,7 @@ struct MainMessagesView: View {
         NavigationView{
             //nav bar
             VStack{
-                Text("Current user id:  \(vm.errorMessage)")
+                //Text("Current user id:  \(vm.chatUser?.email ?? "" )")
                 customNavBar
                 messagesView
                 
@@ -58,12 +74,20 @@ struct MainMessagesView: View {
     
     private var customNavBar : some View {
         HStack(spacing: 14){
-            Image(systemName: "person.fill")
-                .font(.system(size: 34, weight: .heavy))
+            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+                .resizable()
+                .scaledToFill()
+                .frame(width: 50, height: 50)
+                .clipped()
+                .cornerRadius(50)
+                .overlay(RoundedRectangle(cornerRadius: 44)
+                    .stroke(Color(.label), lineWidth: 1))
+                .shadow(radius: 5)
             
             VStack (alignment: .leading, spacing: 4){
-                Text("Username")
+                Text("\(vm.chatUser?.email ?? "" )")
                     .font(.system(size: 24 , weight: .bold))
+        
                 
                 HStack {
                     Text("Online")
@@ -86,6 +110,7 @@ struct MainMessagesView: View {
             
         }
         .padding(.horizontal)
+        .padding(.bottom)
         .actionSheet(isPresented: $shouldShowLogOut) {
             .init(title: Text("Settings"), message:Text("What do you want to do?"), buttons: [.destructive(Text("Sign out"), action: {print("signed out")}), .cancel()])
         }
