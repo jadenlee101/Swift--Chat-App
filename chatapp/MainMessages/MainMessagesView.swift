@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MainMessagesView: View {
+    
+    @State var shouldShowLogOut = false
+    
     var body: some View {
         NavigationView{
             //nav bar
@@ -31,9 +34,20 @@ struct MainMessagesView: View {
                         }
                     }
                     Spacer()
-                    Image(systemName: "gear")
+                    Button{
+                        shouldShowLogOut.toggle()
+                    }  label: {
+                        Image(systemName: "gear")
+                            .foregroundColor(Color(.label))
+                            .font(.system(size: 24, weight: .bold))
+                    }
+                    
                 }
                 .padding(.horizontal)
+                .actionSheet(isPresented: $shouldShowLogOut) {
+                    .init(title: Text("Settings"), message:Text("What do you want to do?"), buttons: [.destructive(Text("Sign out"), action: {print("signed out")}), .cancel()])
+                }
+                
                 ScrollView{
                     VStack{
                         HStack (spacing: 16){
@@ -41,7 +55,7 @@ struct MainMessagesView: View {
                                 .font(.system(size: 32))
                                 .padding(8)
                                 .overlay(RoundedRectangle(cornerRadius: 44)
-                                    .stroke(Color.black, lineWidth: 1)
+                                    .stroke(Color(.label), lineWidth: 1)
                                 )
                             
                             VStack (alignment: .leading){
@@ -58,13 +72,27 @@ struct MainMessagesView: View {
                     }
                     .padding(.horizontal)
                 }
-                Button{} label: {
-                    Text("+ New messages")
-                        .background(Color.blue)
-                }
+                .padding(.bottom, 50)
                 
                 
             }
+            .overlay(
+                Button{} label: {
+                    HStack (){
+                        Spacer()
+                        Text("+ New messages")
+                            .font(.system(size: 16, weight: .bold))
+                            
+                        Spacer()
+                    }
+                    .foregroundColor(Color.white)
+                    .padding(.vertical)
+                        .background(Color.blue)
+                        .cornerRadius(32)
+                        .padding(.horizontal)
+                    
+                }, alignment: .bottom
+            )
             .navigationBarHidden(true)
             
         }
