@@ -54,6 +54,7 @@ class MainMessaseViewModel: ObservableObject {
 struct MainMessagesView: View {
     
     @State var shouldShowLogOut = false
+    @State var shouldNavigateToChatLogView = false
     
     @ObservedObject private var vm = MainMessaseViewModel()
     
@@ -65,14 +66,19 @@ struct MainMessagesView: View {
                 customNavBar
                 messagesView
                 
+                NavigationLink("", isActive: $shouldNavigateToChatLogView) {
+                    ChatLogView(chatUser: self.chatUser)
+                }
                 
             }
-            .overlay(
-                newMessageButton, alignment: .bottom
-            )
-            .navigationBarHidden(true)
-            
-        }
+                .overlay(
+                    newMessageButton, alignment: .bottom
+                )
+                .navigationBarHidden(true)
+                
+            }
+        
+        
     }
     
     private var customNavBar : some View {
@@ -137,6 +143,8 @@ struct MainMessagesView: View {
     
     @State var shouldShowNewMessageScreen = false
     
+    @State var chatUser : ChatUser?
+    
     private var newMessageButton : some View {
         Button{
             shouldShowNewMessageScreen.toggle()
@@ -155,39 +163,67 @@ struct MainMessagesView: View {
                 .padding(.horizontal)
         }
         .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
-            NewMessageScreen()
+            NewMessageScreen(didSelectNewUser: {user in
+                print(user.email)
+                self.shouldNavigateToChatLogView.toggle()
+                self.chatUser = user
+            })
+            
         }
+        
+        //
     }
+
     
     private var messagesView : some View {
         ScrollView{
-            VStack{
-                HStack (spacing: 16){
-                    Image(systemName: "person.fill")
-                        .font(.system(size: 32))
-                        .padding(8)
-                        .overlay(RoundedRectangle(cornerRadius: 44)
-                            .stroke(Color(.label), lineWidth: 1)
-                        )
-                    
-                    VStack (alignment: .leading){
-                        Text("UserName")
-                        Text("message sent to the user")
+            ForEach(0..<10, id: \.self) { num in
+                VStack{
+                    NavigationLink{
+                        Text("destination") }
+                label: {
+                    HStack (spacing: 16){
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 32))
+                            .padding(8)
+                            .overlay(RoundedRectangle(cornerRadius: 44)
+                                .stroke(Color(.label), lineWidth: 1)
+                            )
+                        
+                        VStack (alignment: .leading){
+                            Text("UserName")
+                            Text("message sent to the user")
+                        }
+                        Spacer()
+                        
+                        Text("22d")
+                            .font(.system(size: 14, weight: .semibold))
                     }
-                    Spacer()
                     
-                    Text("22d")
-                        .font(.system(size: 14, weight: .semibold))
                 }
-                Divider()
-                    .padding(.vertical, 8)
+                    Divider()
+                        .padding(.vertical, 8)
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
+            .padding(.bottom, 50)
         }
-        .padding(.bottom, 50)
     }
     
     
+}
+
+struct ChatLogView : View {
+    
+    let chatUser : ChatUser?
+    
+    var body: some View {
+        ScrollView{
+            ForEach(0..<10) { nnum in
+                Text("Test mesages")
+            }
+        }.navigationTitle(chatUser?.email ?? "")
+    }
 }
 
 struct MainMessagesView_Previews: PreviewProvider {

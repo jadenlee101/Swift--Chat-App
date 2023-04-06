@@ -38,17 +38,21 @@ class CreateNewMessageViewModel : ObservableObject {
 
 struct NewMessageScreen: View {
     
+    let didSelectNewUser : (ChatUser) -> ()
+    
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var vm = CreateNewMessageViewModel()
     
     var body: some View {
         
         NavigationView{
+            
             ScrollView {
                 Text(vm.errorMessage)
                 ForEach(vm.users) { user in
                     Button {
                         presentationMode.wrappedValue.dismiss()
+                        didSelectNewUser(user)
                     } label: {
                         
                         
