@@ -9,7 +9,6 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 
-
 class MainMessaseViewModel: ObservableObject {
     
     @Published var errorMessage = ""
@@ -136,8 +135,12 @@ struct MainMessagesView: View {
         }
     }
     
+    @State var shouldShowNewMessageScreen = false
+    
     private var newMessageButton : some View {
-        Button{} label: {
+        Button{
+            shouldShowNewMessageScreen.toggle()
+        } label: {
             HStack (){
                 Spacer()
                 Text("+ New messages")
@@ -150,7 +153,9 @@ struct MainMessagesView: View {
                 .background(Color.blue)
                 .cornerRadius(32)
                 .padding(.horizontal)
-            
+        }
+        .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
+            NewMessageScreen()
         }
     }
     
