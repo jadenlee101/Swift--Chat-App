@@ -75,10 +75,7 @@ struct MainMessagesView: View {
                     newMessageButton, alignment: .bottom
                 )
                 .navigationBarHidden(true)
-                
             }
-        
-        
     }
     
     private var customNavBar : some View {
@@ -213,18 +210,7 @@ struct MainMessagesView: View {
     
 }
 
-struct ChatLogView : View {
-    
-    let chatUser : ChatUser?
-    
-    var body: some View {
-        ScrollView{
-            ForEach(0..<10) { nnum in
-                Text("Test mesages")
-            }
-        }.navigationTitle(chatUser?.email ?? "")
-    }
-}
+
 
 struct MainMessagesView_Previews: PreviewProvider {
     static var previews: some View {
