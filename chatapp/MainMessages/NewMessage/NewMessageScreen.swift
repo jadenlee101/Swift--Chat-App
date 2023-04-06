@@ -47,19 +47,25 @@ struct NewMessageScreen: View {
             ScrollView {
                 Text(vm.errorMessage)
                 ForEach(vm.users) { user in
-                    HStack(spacing: 16){
-                        WebImage(url: URL(string: user.profileImageUrl))
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 50, height: 50)
-                            .clipped()
-                            .cornerRadius(50)
-                        Text(user.email)
-                        Spacer()
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        
+                        
+                        HStack(spacing: 16){
+                            WebImage(url: URL(string: user.profileImageUrl))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 50, height: 50)
+                                .clipped()
+                                .cornerRadius(50)
+                            Text(user.email)
+                                .foregroundColor(Color(.label))
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        Divider()
                     }
-                    .padding(.horizontal)
-                    Divider()
-                    
                 }
             }.navigationTitle("New message")
                 .toolbar{
