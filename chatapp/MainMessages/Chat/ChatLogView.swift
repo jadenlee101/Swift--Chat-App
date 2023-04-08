@@ -9,15 +9,59 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+struct FirebaseConstants {
+    static let fromId = "fromId"
+    static let toId = "toId"
+    static let text = "text"
+}
+
+struct ChatMessage {
+    let fromId , toId , text : String
+    
+    init(data : [String : Any]) {
+        self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
+        self.toId = data[FirebaseConstants.toId] as? String ?? ""
+        self.text = data[FirebaseConstants.text] as? String ?? ""
+    }
+}
+
 class ChatLogViewModel : ObservableObject {
     
     @Published var chatText = ""
     @Published var errorMessage = ""
+    @Published var chatMessages = [ChatMessage]()
+    
     
     let chatUser : ChatUser?
     
     init(chatUser: ChatUser?){
         self.chatUser = chatUser
+        fetchMessages()
+    }
+    
+    private func fetchMessages(){
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = chatUser?.uid else {return}
+        FirebaseManager.shared.firestore
+            .collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .addSnapshotListener{querySnapshot, err in
+                if let err = err {
+                    self.errorMessage = "failed to listen for the mesage"
+                    print(err)
+                    return
+                }
+                
+                querySnapshot?.documents.forEach({ querySnapshot in
+                    let data = querySnapshot.data()
+                    let chatMessage = ChatMessage(data: data)
+                    self.chatMessages.append(chatMessage)
+                    
+                })
+            }
+            
+        
     }
     
     func handleSend(){
@@ -33,7 +77,7 @@ class ChatLogViewModel : ObservableObject {
             .collection(toId)
             .document()
         
-        let messageData = ["fromId" : fromId , "toId" : toId , "text" : self.chatText , "timeStamp" : Timestamp()] as [String : Any]
+        let messageData = [FirebaseConstants.fromId : fromId , FirebaseConstants.toId : toId , FirebaseConstants.text : self.chatText , "timeStamp" : Timestamp()] as [String : Any]
         
         document.setData(messageData) { err in
             if let err = err  {
@@ -79,9 +123,6 @@ struct ChatLogView : View {
                 chatBottomBar
                     .background(Color.white.ignoresSafeArea())
             }
-            
-            
-            
         }
     }
     
