@@ -15,10 +15,15 @@ struct FirebaseConstants {
     static let text = "text"
 }
 
-struct ChatMessage {
-    let fromId , toId , text : String
+struct ChatMessage : Identifiable {
     
-    init(data : [String : Any]) {
+    var id: String { documentId }
+    
+    let fromId , toId , text : String
+    let documentId : String
+    
+    init(documentId : String, data : [String : Any]) {
+        self.documentId = documentId
         self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
         self.toId = data[FirebaseConstants.toId] as? String ?? ""
         self.text = data[FirebaseConstants.text] as? String ?? ""
@@ -55,7 +60,8 @@ class ChatLogViewModel : ObservableObject {
                 
                 querySnapshot?.documents.forEach({ querySnapshot in
                     let data = querySnapshot.data()
-                    let chatMessage = ChatMessage(data: data)
+                    let docId = querySnapshot.documentID
+                    let chatMessage = ChatMessage(documentId: docId, data: data)
                     self.chatMessages.append(chatMessage)
                     
                 })
@@ -128,12 +134,12 @@ struct ChatLogView : View {
     
     private var messagesView : some View {
         ScrollView{
-            ForEach(0..<15) { num in
-                
+            ForEach(vm.chatMessages) { message in
+            
                 HStack{
                     Spacer()
                     HStack{
-                        Text("Test mesages")
+                        Text(message.text)
                             .foregroundColor(Color.white)
                     }
                     .padding()
