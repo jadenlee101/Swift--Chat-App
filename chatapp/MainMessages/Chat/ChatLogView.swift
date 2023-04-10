@@ -57,14 +57,21 @@ class ChatLogViewModel : ObservableObject {
                     print(err)
                     return
                 }
-                
-                querySnapshot?.documents.forEach({ querySnapshot in
-                    let data = querySnapshot.data()
-                    let docId = querySnapshot.documentID
-                    let chatMessage = ChatMessage(documentId: docId, data: data)
-                    self.chatMessages.append(chatMessage)
-                    
+                querySnapshot?.documentChanges.forEach({ change in
+                    if change.type == .added {
+                        let data = change.document.data()
+                        self.chatMessages.append(.init(documentId: change.document.documentID, data: data))
+                    }
                 })
+                
+//                querySnapshot?.documents.forEach({ querySnapshot in
+//                    let data = querySnapshot.data()
+//                    let docId = querySnapshot.documentID
+//                    let chatMessage = ChatMessage(documentId: docId, data: data)
+//                    self.chatMessages.append(chatMessage)
+                    
+       //         }
+        //)
             }
             
         
