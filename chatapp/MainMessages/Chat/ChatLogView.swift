@@ -142,19 +142,49 @@ struct ChatLogView : View {
     private var messagesView : some View {
         ScrollView{
             ForEach(vm.chatMessages) { message in
-            
-                HStack{
-                    Spacer()
-                    HStack{
-                        Text(message.text)
-                            .foregroundColor(Color.white)
+                VStack{
+                    if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                        HStack{
+                            Spacer()
+                            HStack{
+                                Text(message.text)
+                                    .foregroundColor(Color.white)
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                        }
+                        
+                    } else {
+                        HStack{
+                            
+                            HStack{
+                                Text(message.text)
+                                    .foregroundColor(Color.black)
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 6)
                     }
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
                 }
                 .padding(.horizontal)
                 .padding(.top, 6)
+//                HStack{
+//                    Spacer()
+//                    HStack{
+//                        Text(message.text)
+//                            .foregroundColor(Color.black)
+//                    }
+//                    .padding()
+//                    .background(Color.orange)
+//                    .cornerRadius(8)
+//                }
+//                .padding(.horizontal)
+//                .padding(.top, 6)
             }
             HStack{
                 Spacer()
