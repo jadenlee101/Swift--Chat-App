@@ -114,6 +114,8 @@ class ChatLogViewModel : ObservableObject {
             
         }
     }
+    
+    @Published var count = 0
 }
 
 struct ChatLogView : View {
@@ -141,58 +143,23 @@ struct ChatLogView : View {
     
     private var messagesView : some View {
         ScrollView{
-            ForEach(vm.chatMessages) { message in
-                VStack{
-                    if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
-                        HStack{
-                            Spacer()
-                            HStack{
-                                Text(message.text)
-                                    .foregroundColor(Color.white)
-                            }
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(8)
-                        }
-                        
-                    } else {
-                        HStack{
-                            
-                            HStack{
-                                Text(message.text)
-                                    .foregroundColor(Color.black)
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 6)
-                    }
+            ScrollViewReader{ ScrollViewProxy in
+                ForEach(vm.chatMessages) { message in
+                    MessageView(message: message)
                 }
-                .padding(.horizontal)
-                .padding(.top, 6)
-//                HStack{
-//                    Spacer()
-//                    HStack{
-//                        Text(message.text)
-//                            .foregroundColor(Color.black)
-//                    }
-//                    .padding()
-//                    .background(Color.orange)
-//                    .cornerRadius(8)
-//                }
-//                .padding(.horizontal)
-//                .padding(.top, 6)
-            }
-            HStack{
-                Spacer()
                 
+                HStack{Spacer()}
+                    .id("empty")
+                    .onReceive(vm.$count) { _ in
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            ScrollViewProxy.scrollTo("empty", anchor: .bottom)
+                        }
+                    }
             }
         }
         .navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarItems(trailing: Button(action: {vm.count += 1 }, label: {Text("count : \(vm.count)")}))
         .background(Color(.init(white: 0.95, alpha: 1)))
         .safeAreaInset(edge: .bottom){
             chatBottomBar
@@ -226,6 +193,46 @@ struct ChatLogView : View {
         
 }
 
+struct MessageView: View {
+    
+    let message : ChatMessage
+    
+    var body: some View {
+        VStack{
+            if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
+                HStack{
+                    Spacer()
+                    HStack{
+                        Text(message.text)
+                            .foregroundColor(Color.white)
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                }
+                
+            } else {
+                HStack{
+                    
+                    HStack{
+                        Text(message.text)
+                            .foregroundColor(Color.black)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, 6)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 6)
+        
+    }
+}
+
 private struct DescriptionPlaceholder: View {
     var body: some View {
         HStack {
@@ -244,3 +251,5 @@ struct ChatLogView_Previews: PreviewProvider {
         MainMessagesView()
     }
 }
+
+
