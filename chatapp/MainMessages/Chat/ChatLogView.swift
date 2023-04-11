@@ -63,6 +63,9 @@ class ChatLogViewModel : ObservableObject {
                         self.chatMessages.append(.init(documentId: change.document.documentID, data: data))
                     }
                 })
+                DispatchQueue.main.async {
+                    self.count += 1
+                }
                 
 //                querySnapshot?.documents.forEach({ querySnapshot in
 //                    let data = querySnapshot.data()
