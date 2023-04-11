@@ -110,8 +110,9 @@ class ChatLogViewModel : ObservableObject {
                 self.errorMessage = "failed to store message into Firestore\(err)"
                 return
             }
+            print("message sent success")
             self.chatText = ""
-            
+            self.count += 1
         }
     }
     
@@ -141,6 +142,7 @@ struct ChatLogView : View {
         }
     }
     
+    static let emptyScrollToString = "empty"
     private var messagesView : some View {
         ScrollView{
             ScrollViewReader{ ScrollViewProxy in
@@ -149,17 +151,17 @@ struct ChatLogView : View {
                 }
                 
                 HStack{Spacer()}
-                    .id("empty")
+                    .id(Self.emptyScrollToString)
                     .onReceive(vm.$count) { _ in
                         withAnimation(.easeOut(duration: 0.5)) {
-                            ScrollViewProxy.scrollTo("empty", anchor: .bottom)
+                            ScrollViewProxy.scrollTo(Self.emptyScrollToString, anchor: .bottom)
                         }
                     }
             }
         }
         .navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarItems(trailing: Button(action: {vm.count += 1 }, label: {Text("count : \(vm.count)")}))
+        //.navigationBarItems(trailing: Button(action: {vm.count += 1 }, label: {Text("count : \(vm.count)")}))
         .background(Color(.init(white: 0.95, alpha: 1)))
         .safeAreaInset(edge: .bottom){
             chatBottomBar
