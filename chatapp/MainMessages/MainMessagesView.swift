@@ -14,8 +14,9 @@ struct RecentMessage : Identifiable {
     var id: String {documentId}
     
     let documentId : String
-    let text,fromId,toId : String
-    let email, profileImageUrl : String
+    let text,email: String
+    let fromId , toId : String
+    let profileImageUrl : String
     let timestamp : Timestamp
     
     init(documentId: String, data: [String : Any]) {
@@ -29,7 +30,7 @@ struct RecentMessage : Identifiable {
     }
 }
 
-class MainMessaseViewModel: ObservableObject {
+class MainMessageViewModel: ObservableObject {
     
     @Published var errorMessage = ""
     @Published var chatUser : ChatUser?
@@ -45,26 +46,38 @@ class MainMessaseViewModel: ObservableObject {
     
     @Published var recentMessages = [RecentMessage]()
     
-    private func fetchRecentMessages (){
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return}
+    private func fetchRecentMessages() {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
         FirebaseManager.shared.firestore
-            .collection("reecent_messages")
+            .collection("recent_messages")
             .document(uid)
             .collection("messages")
-            .addSnapshotListener{ querySnapshot, error in
+            .order(by: "timestamp")
+            .addSnapshotListener { querySnapshot, error in
                 if let error = error {
-                self.errorMessage = "failed to listen for recent messages \(error)"
+                    self.errorMessage = "Failed to listen for recent messages: \(error)"
+                    print(error)
+                    return
                 }
+                
                 querySnapshot?.documentChanges.forEach({ change in
-                    //if change.type == .added {
-                        let docId = change.document.documentID
-                        self.recentMessages.append(.init(documentId: docId, data: change.document.data()))
-                    //}
+                    let docId = change.document.documentID
+                    
+                    if let index = self.recentMessages.firstIndex(where: { rm in
+                        return rm.documentId == docId
+                    }) {
+                        self.recentMessages.remove(at: index)
+                    }
+                    
+                    self.recentMessages.insert(.init(documentId: docId, data: change.document.data()), at: 0)
+                    
+                    
+//                    self.recentMessages.append()
                 })
             }
     }
-    
+
     func fetchCurrentUser(){
         
         guard let uid = 
@@ -99,7 +112,7 @@ struct MainMessagesView: View {
     @State var shouldShowLogOut = false
     @State var shouldNavigateToChatLogView = false
     
-    @ObservedObject private var vm = MainMessaseViewModel()
+    @ObservedObject private var vm = MainMessageViewModel()
     
     var body: some View {
         NavigationView{
@@ -217,7 +230,7 @@ struct MainMessagesView: View {
     
     private var messagesView : some View {
         ScrollView{
-            ForEach(0..<10, id: \.self) { num in
+            ForEach(vm.recentMessages) { recentMessage in
                 VStack{
                     NavigationLink{
                         Text("destination") }
@@ -230,9 +243,11 @@ struct MainMessagesView: View {
                                 .stroke(Color(.label), lineWidth: 1)
                             )
                         
-                        VStack (alignment: .leading){
-                            Text("UserName")
-                            Text("message sent to the user")
+                        VStack (alignment: .leading, spacing: 8){
+                            Text(recentMessage.email)
+                                .font(.system(size: 18))
+                                .foregroundColor(Color(.label))
+                            Text(recentMessage.text)
                         }
                         Spacer()
                         

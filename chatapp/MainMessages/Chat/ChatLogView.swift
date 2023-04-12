@@ -13,7 +13,7 @@ struct FirebaseConstants {
     static let fromId = "fromId"
     static let toId = "toId"
     static let text = "text"
-    static let timeStamp = "timeStamp"
+    static let timestamp = "timestamp"
     static let email = "email"
     static let profileImageUrl = "profileImageUrl"
 }
@@ -30,7 +30,7 @@ struct ChatMessage : Identifiable {
         self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
         self.toId = data[FirebaseConstants.toId] as? String ?? ""
         self.text = data[FirebaseConstants.text] as? String ?? ""
-        //self.email = data[FirebaseConstants.email] as? String ?? ""
+      //  self.timestamp = data[FirebaseConstants.timestamp] as? Timestamp
         
         
     }
@@ -57,6 +57,7 @@ class ChatLogViewModel : ObservableObject {
             .collection("messages")
             .document(fromId)
             .collection(toId)
+            .order(by: FirebaseConstants.timestamp)
             .addSnapshotListener{querySnapshot, err in
                 if let err = err {
                     self.errorMessage = "failed to listen for the mesage"
@@ -99,7 +100,7 @@ class ChatLogViewModel : ObservableObject {
             .collection(toId)
             .document()
         
-        let messageData = [FirebaseConstants.fromId : fromId , FirebaseConstants.toId : toId , FirebaseConstants.text : self.chatText , "timeStamp" : Timestamp()] as [String : Any]
+        let messageData = [FirebaseConstants.fromId : fromId , FirebaseConstants.toId : toId , FirebaseConstants.text : self.chatText , FirebaseConstants.timestamp : Timestamp()] as [String : Any]
         
         document.setData(messageData) { err in
             if let err = err  {
@@ -140,7 +141,8 @@ class ChatLogViewModel : ObservableObject {
             .document(toId)
         
         let data = [
-            "timestamp" : Timestamp() ,
+            //"timestamp" : Timestamp() ,
+            FirebaseConstants.timestamp: Timestamp(),
             FirebaseConstants.text : self.chatText,
             FirebaseConstants.fromId : uid,
             FirebaseConstants.toId : toId,
@@ -289,6 +291,16 @@ private struct DescriptionPlaceholder: View {
     }
 }
 
+
+
+/////////
+
+
+
+
+
+
+///////////
 struct ChatLogView_Previews: PreviewProvider {
     static var previews: some View {
         MainMessagesView()
