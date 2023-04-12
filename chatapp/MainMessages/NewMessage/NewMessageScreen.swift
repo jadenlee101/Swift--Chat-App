@@ -8,6 +8,7 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+
 class CreateNewMessageViewModel : ObservableObject {
     
     @Published var users = [ChatUser]()
