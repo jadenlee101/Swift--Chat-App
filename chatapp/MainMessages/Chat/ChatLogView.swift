@@ -13,6 +13,9 @@ struct FirebaseConstants {
     static let fromId = "fromId"
     static let toId = "toId"
     static let text = "text"
+    static let timeStamp = "timeStamp"
+    static let email = "email"
+    static let profileImageUrl = "profileImageUrl"
 }
 
 struct ChatMessage : Identifiable {
@@ -27,6 +30,9 @@ struct ChatMessage : Identifiable {
         self.fromId = data[FirebaseConstants.fromId] as? String ?? ""
         self.toId = data[FirebaseConstants.toId] as? String ?? ""
         self.text = data[FirebaseConstants.text] as? String ?? ""
+        //self.email = data[FirebaseConstants.email] as? String ?? ""
+        
+        
     }
 }
 
@@ -113,12 +119,44 @@ class ChatLogViewModel : ObservableObject {
                 self.errorMessage = "failed to store message into Firestore\(err)"
                 return
             }
+            
             print("message sent success")
+            
+            self.persistRecentMessage()
             self.chatText = ""
             self.count += 1
         }
     }
     
+    private func persistRecentMessage(){
+        guard let chatUser = chatUser else {return}
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
+        guard let toId = self.chatUser?.uid else {return}
+        
+        let document = FirebaseManager.shared.firestore
+            .collection("recent_messages")
+            .document(uid)
+            .collection("messages")
+            .document(toId)
+        
+        let data = [
+            "timestamp" : Timestamp() ,
+            FirebaseConstants.text : self.chatText,
+            FirebaseConstants.fromId : uid,
+            FirebaseConstants.toId : toId,
+            FirebaseConstants.profileImageUrl : chatUser.profileImageUrl,
+            FirebaseConstants.email : chatUser.email
+        ] as [String : Any]
+            
+        
+        document.setData(data) { err in
+            if let err = err {
+                self.errorMessage = "failed to save recent message \(err)"
+                return
+            }
+            
+        }
+    }
     @Published var count = 0
 }
 
