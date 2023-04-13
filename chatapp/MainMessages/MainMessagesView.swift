@@ -28,8 +28,10 @@ class MainMessageViewModel: ObservableObject {
     
     @Published var recentMessages = [RecentMessage]()
     
-    private func fetchRecentMessages() {
+     func fetchRecentMessages() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+         
+         self.recentMessages.removeAll()
         
         FirebaseManager.shared.firestore
             .collection("recent_messages")
@@ -179,6 +181,7 @@ struct MainMessagesView: View {
             LoginView(didCompleteLogin: {
                 self.vm.isUserCurrentlyLoggedOut = false
                 self.vm.fetchCurrentUser()
+                self.vm.fetchRecentMessages()
             })
         }
     }
@@ -209,6 +212,7 @@ struct MainMessagesView: View {
                 print(user.email)
                 self.shouldNavigateToChatLogView.toggle()
                 self.chatUser = user
+                
             })
             
         }
