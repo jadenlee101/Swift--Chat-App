@@ -8,7 +8,9 @@
 import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseFirestore
-
+import FirebaseFirestoreSwift
+import Firebase
+import FirebaseAuth
 
 class MainMessageViewModel: ObservableObject {
     
@@ -18,7 +20,7 @@ class MainMessageViewModel: ObservableObject {
     init (){
         DispatchQueue.main.async {
             self.isUserCurrentlyLoggedOut =
-            FirebaseManager.shared.auth.currentUser?.uid == nil 
+            FirebaseManager.shared.auth.currentUser?.uid == nil
         }
         fetchCurrentUser()
         fetchRecentMessages()
@@ -45,15 +47,22 @@ class MainMessageViewModel: ObservableObject {
                     let docId = change.document.documentID
                     
                     if let index = self.recentMessages.firstIndex(where: { rm in
-                        return rm.documentId == docId
+                        return rm.id == docId
                     }) {
                         self.recentMessages.remove(at: index)
                     }
+                    do {
+                        if let rm = try? change.document.data(as: RecentMessage.self) {
+                            self.recentMessages.insert(rm, at: 0)
+                        }
+
+                    } catch{
+                        print(error)
+                    }
+                   // self.recentMessages.insert(.init(documentId: docId, data: change.document.data()), at: 0)
                     
-                    self.recentMessages.insert(.init(documentId: docId, data: change.document.data()), at: 0)
                     
-                    
-//                    self.recentMessages.append()
+                    //self.recentMessages.append()
                 })
             }
     }
@@ -234,9 +243,10 @@ struct MainMessagesView: View {
                         //                            )
                         
                         VStack (alignment: .leading, spacing: 8){
-                            Text(recentMessage.email)
+                            Text(recentMessage.userName)
                                 .font(.system(size: 18))
                                 .foregroundColor(Color(.label))
+                                .multilineTextAlignment(.leading)
                             Text(recentMessage.text)
                                 .font(.system(size: 14))
                                 .foregroundColor(Color(.darkGray))
@@ -244,8 +254,9 @@ struct MainMessagesView: View {
                         }
                         Spacer()
                         
-                        Text("22d")
+                        Text(recentMessage.timeAgo)
                             .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color(.label))
                     }
                     
                 }
