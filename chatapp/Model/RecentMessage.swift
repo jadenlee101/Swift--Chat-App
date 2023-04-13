@@ -28,6 +28,7 @@ struct RecentMessage : Codable, Identifiable {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: timestamp, relativeTo: Date())
+        
     }
     
 //    init(documentId: String, data: [String : Any]) {
