@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E041546F29E79EB500959F22 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E041546E29E79EB500959F22 /* FirebaseFirestoreSwift */; };
+		E041547129E79EE900959F22 /* RecentMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E041547029E79EE900959F22 /* RecentMessage.swift */; };
 		E04C29D729D780CA002900DF /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E04C29D629D780CA002900DF /* FirebaseAuth */; };
 		E04C29D929D780CA002900DF /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = E04C29D829D780CA002900DF /* FirebaseStorage */; };
 		E04C29DB29D8BF67002900DF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E04C29DA29D8BF67002900DF /* GoogleService-Info.plist */; };
@@ -27,6 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E041547029E79EE900959F22 /* RecentMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMessage.swift; sourceTree = "<group>"; };
 		E04C29DA29D8BF67002900DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E04C29E129DA49F6002900DF /* ImagePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		E04C29E629DCFA9C002900DF /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
@@ -49,6 +52,7 @@
 				E04C29ED29DD7205002900DF /* SDWebImageSwiftUI in Frameworks */,
 				E04C29E029D8CEC8002900DF /* FirebaseAnalyticsSwift in Frameworks */,
 				E04C29D729D780CA002900DF /* FirebaseAuth in Frameworks */,
+				E041546F29E79EB500959F22 /* FirebaseFirestoreSwift in Frameworks */,
 				E04C29D929D780CA002900DF /* FirebaseStorage in Frameworks */,
 				E04C29E429DCD9AB002900DF /* FirebaseFirestore in Frameworks */,
 				E04C29DE29D8CEC2002900DF /* FirebaseAnalytics in Frameworks */,
@@ -87,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				E04C29EF29DD84E4002900DF /* ChatUser.swift */,
+				E041547029E79EE900959F22 /* RecentMessage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -171,6 +176,7 @@
 				E04C29DF29D8CEC8002900DF /* FirebaseAnalyticsSwift */,
 				E04C29E329DCD9AB002900DF /* FirebaseFirestore */,
 				E04C29EC29DD7205002900DF /* SDWebImageSwiftUI */,
+				E041546E29E79EB500959F22 /* FirebaseFirestoreSwift */,
 			);
 			productName = chatapp;
 			productReference = E05332A629CD03A30018BB9C /* chatapp.app */;
@@ -233,6 +239,7 @@
 			files = (
 				E04C29F029DD84E4002900DF /* ChatUser.swift in Sources */,
 				E04C29F629DE9D79002900DF /* ChatLogView.swift in Sources */,
+				E041547129E79EE900959F22 /* RecentMessage.swift in Sources */,
 				E04C29E229DA49F6002900DF /* ImagePicker.swift in Sources */,
 				E04C29E729DCFA9C002900DF /* MainMessagesView.swift in Sources */,
 				E04C29EA29DD64BD002900DF /* FirebaseManager.swift in Sources */,
@@ -462,6 +469,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E041546E29E79EB500959F22 /* FirebaseFirestoreSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E04C29D529D780CA002900DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestoreSwift;
+		};
 		E04C29D629D780CA002900DF /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E04C29D529D780CA002900DF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
