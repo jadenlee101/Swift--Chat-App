@@ -9,88 +9,91 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 
-class CreateNewMessageViewModel : ObservableObject {
+import SwiftUI
+import SDWebImageSwiftUI
+
+class CreateNewMessageViewModel: ObservableObject {
     
     @Published var users = [ChatUser]()
     @Published var errorMessage = ""
-    init (){
+    
+    init() {
         fetchAllUsers()
     }
     
-    private func fetchAllUsers(){
-        FirebaseManager.shared.firestore
-            .collection("users")
-            .getDocuments {
-                documentSnapshot, err in
-                if let err = err {
-                    self.errorMessage = "failed to fetch"
-                    print("failed to fetch users \(err)")
+    private func fetchAllUsers() {
+        FirebaseManager.shared.firestore.collection("users")
+            .getDocuments { documentsSnapshot, error in
+                if let error = error {
+                    self.errorMessage = "Failed to fetch users: \(error)"
+                    print("Failed to fetch users: \(error)")
                     return
                 }
-                documentSnapshot?.documents.forEach({snapshot in
-                    let data = snapshot.data()
-                    self.users.append(.init(data: data))
+                
+                documentsSnapshot?.documents.forEach({ snapshot in
+                    let user = try? snapshot.data(as: ChatUser.self)
+                    if user?.uid != FirebaseManager.shared.auth.currentUser?.uid {
+                        self.users.append(user!)
+                    }
+                    
                 })
-                self.errorMessage = "fetched success "
             }
     }
-    
 }
 
-struct NewMessageScreen: View {
+struct CreateNewMessageView: View {
     
-    let didSelectNewUser : (ChatUser) -> ()
+    let didSelectNewUser: (ChatUser) -> ()
     
     @Environment(\.presentationMode) var presentationMode
+    
     @ObservedObject var vm = CreateNewMessageViewModel()
     
     var body: some View {
-        
-        NavigationView{
-            
+        NavigationView {
             ScrollView {
                 Text(vm.errorMessage)
+                
                 ForEach(vm.users) { user in
                     Button {
                         presentationMode.wrappedValue.dismiss()
                         didSelectNewUser(user)
                     } label: {
-                        
-                        
-                        HStack(spacing: 16){
+                        HStack(spacing: 16) {
                             WebImage(url: URL(string: user.profileImageUrl))
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 50, height: 50)
                                 .clipped()
                                 .cornerRadius(50)
+                                .overlay(RoundedRectangle(cornerRadius: 50)
+                                            .stroke(Color(.label), lineWidth: 2)
+                                )
                             Text(user.email)
                                 .foregroundColor(Color(.label))
                             Spacer()
-                        }
-                        .padding(.horizontal)
-                        Divider()
+                        }.padding(.horizontal)
                     }
+                    Divider()
+                        .padding(.vertical, 8)
                 }
-            }.navigationTitle("New message")
-                .toolbar{
-                    ToolbarItemGroup (
-                    placement: .navigationBarLeading
-                    ) {
-                        Button{
+            }.navigationTitle("New Message")
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button {
                             presentationMode.wrappedValue.dismiss()
                         } label: {
                             Text("Cancel")
                         }
                     }
-
                 }
         }
     }
 }
 
-struct NewMessageScreen_Previews: PreviewProvider {
+struct CreateNewMessageView_Previews: PreviewProvider {
     static var previews: some View {
+//        CreateNewMessageView()
         MainMessagesView()
     }
 }
