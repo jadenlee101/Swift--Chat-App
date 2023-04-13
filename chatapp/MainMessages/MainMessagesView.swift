@@ -108,6 +108,8 @@ struct MainMessagesView: View {
     
     @ObservedObject private var vm = MainMessageViewModel()
     
+    private var chatLogViewModel = ChatLogViewModel(chatUser: nil )
+    
     var body: some View {
         NavigationView{
             //nav bar
@@ -117,7 +119,7 @@ struct MainMessagesView: View {
                 messagesView
                 
                 NavigationLink("", isActive: $shouldNavigateToChatLogView) {
-                    ChatLogView(chatUser: self.chatUser)
+                    ChatLogView(vm: chatLogViewModel)
                 }
                 
             }
@@ -215,6 +217,8 @@ struct MainMessagesView: View {
                 print(user.email)
                 self.shouldNavigateToChatLogView.toggle()
                 self.chatUser = user
+                self.chatLogViewModel.chatUser = user
+                self.chatLogViewModel.fetchMessages()
                 
             })
             
@@ -228,8 +232,13 @@ struct MainMessagesView: View {
         ScrollView{
             ForEach(vm.recentMessages) { recentMessage in
                 VStack{
-                    NavigationLink{
-                        Text("destination") }
+                    Button {
+                        let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+                        self.chatUser = .init(data: [FirebaseConstants.email: recentMessage.email, FirebaseConstants.profileImageUrl: recentMessage.profileImageUrl, "uid": uid])
+                        self.chatLogViewModel.chatUser = self.chatUser
+                        self.chatLogViewModel.fetchMessages()
+                        self.shouldNavigateToChatLogView.toggle()
+                    }
                 label: {
                     HStack (spacing: 16){
                         WebImage(url: URL(string:
